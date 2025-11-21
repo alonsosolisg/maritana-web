@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import webpack from "webpack";
 
 const nextConfig: NextConfig = {
   async headers() {
@@ -21,6 +22,12 @@ const nextConfig: NextConfig = {
         ...config.resolve.fallback,
         canvas: false,
       };
+      config.plugins = config.plugins || [];
+      config.plugins.push(
+        new webpack.IgnorePlugin({
+          resourceRegExp: /^canvas$/,
+        })
+      );
     }
     return config;
   },
