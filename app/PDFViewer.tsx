@@ -60,10 +60,26 @@ export default function PDFViewer() {
     <Worker workerUrl={workerUrl}>
       <div className="h-full w-full">
         <Viewer
-          fileUrl="/catalogo.pdf"
+          fileUrl="/catalogo-m.pdf"
           plugins={[defaultLayoutPluginInstance]}
           localization={es_ES}
           defaultScale={SpecialZoomLevel.PageWidth}
+          initialPage={0}
+          renderLoader={(percentages) => (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <div className="text-gray-600 mb-2">
+                  Cargando catálogo... {Math.round(percentages)}%
+                </div>
+                <div className="w-64 h-1 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-blue-600 transition-all duration-300"
+                    style={{ width: `${percentages}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
           renderError={(error) => {
             console.error("Error loading PDF:", error);
             const errorName = error.name || "";
@@ -99,4 +115,3 @@ export default function PDFViewer() {
     </Worker>
   );
 }
-
