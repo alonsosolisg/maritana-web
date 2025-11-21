@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  serverComponentsExternalPackages: ["pdfjs-dist"],
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -22,6 +23,11 @@ const nextConfig: NextConfig = {
       };
     }
     return config;
+  },
+  turbopack: {
+    resolveAlias: {
+      canvas: false,
+    },
   },
 };
 
