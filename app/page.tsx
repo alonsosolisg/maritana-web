@@ -2,44 +2,16 @@
 
 import { Viewer, Worker, SpecialZoomLevel } from "@react-pdf-viewer/core";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
+import es_ES from "@react-pdf-viewer/locales/lib/es_ES.json";
 
 // Import styles
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 
-// Spanish localization
-const spanishLocalization = {
-  "Go to first page": "Ir a la primera página",
-  "Go to previous page": "Ir a la página anterior",
-  "Go to next page": "Ir a la página siguiente",
-  "Go to last page": "Ir a la última página",
-  "Current page": "Página actual",
-  "Go to page": "Ir a la página",
-  "Total pages": "Total de páginas",
-  "Zoom in": "Acercar",
-  "Zoom out": "Alejar",
-  "Rotate clockwise": "Rotar en sentido horario",
-  "Rotate counterclockwise": "Rotar en sentido antihorario",
-  "Hand tool": "Herramienta de mano",
-  "Text selection tool": "Herramienta de selección de texto",
-  "Scrolling hand tool": "Herramienta de desplazamiento",
-  Download: "Descargar",
-  Print: "Imprimir",
-  Search: "Buscar",
-  "Find in document": "Buscar en el documento",
-  "Match case": "Coincidir mayúsculas y minúsculas",
-  "Whole words": "Palabras completas",
-  "Current zoom": "Zoom actual",
-  "Enter full screen": "Pantalla completa",
-  "Exit full screen": "Salir de pantalla completa",
-  "More actions": "Más acciones",
-};
-
-// Use local worker for better performance and reliability
-const workerUrl = `//unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`;
+// Use CDN worker with proper protocol
+const workerUrl = `https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`;
 
 export default function Home() {
-  // Create plugin instance at component level (not in useMemo to avoid hook violations)
   const defaultLayoutPluginInstance = defaultLayoutPlugin({
     sidebarTabs: () => [],
     renderToolbar: (Toolbar) => (
@@ -89,13 +61,16 @@ export default function Home() {
   });
 
   return (
-    <div className="fixed inset-0 h-screen w-screen bg-gray-100">
+    <div
+      className="fixed inset-0 h-screen w-screen bg-gray-100 notranslate"
+      translate="no"
+    >
       <Worker workerUrl={workerUrl}>
         <div className="h-full w-full">
           <Viewer
             fileUrl="/catalogo.pdf"
             plugins={[defaultLayoutPluginInstance]}
-            localization={spanishLocalization}
+            localization={es_ES}
             defaultScale={SpecialZoomLevel.PageWidth}
             renderError={(error) => {
               console.error("Error loading PDF:", error);

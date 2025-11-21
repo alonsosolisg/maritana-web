@@ -16,7 +16,10 @@ export const metadata: Metadata = {
   title: "Maritana - Catálogo",
   description: "Maritana",
   icons: {
-    icon: "/favicon.png",
+    icon: "/favicon.svg",
+  },
+  other: {
+    google: "notranslate",
   },
 };
 
@@ -26,9 +29,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
+    <html lang="es" translate="no">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased notranslate`}
       >
         {children}
       </body>
