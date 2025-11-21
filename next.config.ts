@@ -24,11 +24,7 @@ const nextConfig: NextConfig = {
     }
     return config;
   },
-  turbopack: {
-    resolveAlias: {
-      canvas: false,
-    },
-  },
+  turbopack: {},
 };
 
 export default nextConfig;
