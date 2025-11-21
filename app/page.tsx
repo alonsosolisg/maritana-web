@@ -1,65 +1,135 @@
-import Image from "next/image";
+"use client";
+
+import { Viewer, Worker, SpecialZoomLevel } from "@react-pdf-viewer/core";
+import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
+
+// Import styles
+import "@react-pdf-viewer/core/lib/styles/index.css";
+import "@react-pdf-viewer/default-layout/lib/styles/index.css";
+
+// Spanish localization
+const spanishLocalization = {
+  "Go to first page": "Ir a la primera página",
+  "Go to previous page": "Ir a la página anterior",
+  "Go to next page": "Ir a la página siguiente",
+  "Go to last page": "Ir a la última página",
+  "Current page": "Página actual",
+  "Go to page": "Ir a la página",
+  "Total pages": "Total de páginas",
+  "Zoom in": "Acercar",
+  "Zoom out": "Alejar",
+  "Rotate clockwise": "Rotar en sentido horario",
+  "Rotate counterclockwise": "Rotar en sentido antihorario",
+  "Hand tool": "Herramienta de mano",
+  "Text selection tool": "Herramienta de selección de texto",
+  "Scrolling hand tool": "Herramienta de desplazamiento",
+  Download: "Descargar",
+  Print: "Imprimir",
+  Search: "Buscar",
+  "Find in document": "Buscar en el documento",
+  "Match case": "Coincidir mayúsculas y minúsculas",
+  "Whole words": "Palabras completas",
+  "Current zoom": "Zoom actual",
+  "Enter full screen": "Pantalla completa",
+  "Exit full screen": "Salir de pantalla completa",
+  "More actions": "Más acciones",
+};
+
+// Use local worker for better performance and reliability
+const workerUrl = `//unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`;
 
 export default function Home() {
+  // Create plugin instance at component level (not in useMemo to avoid hook violations)
+  const defaultLayoutPluginInstance = defaultLayoutPlugin({
+    sidebarTabs: () => [],
+    renderToolbar: (Toolbar) => (
+      <Toolbar>
+        {(slots) => {
+          const {
+            CurrentPageInput,
+            GoToPreviousPage,
+            GoToNextPage,
+            NumberOfPages,
+            ZoomIn,
+            ZoomOut,
+          } = slots;
+          return (
+            <div
+              style={{
+                alignItems: "center",
+                display: "flex",
+                width: "100%",
+                justifyContent: "center",
+                gap: "8px",
+              }}
+            >
+              <div style={{ padding: "0 4px" }}>
+                <ZoomOut />
+              </div>
+              <div style={{ padding: "0 4px" }}>
+                <ZoomIn />
+              </div>
+              <div style={{ padding: "0 4px", marginLeft: "16px" }}>
+                <GoToPreviousPage />
+              </div>
+              <div style={{ padding: "0 4px", width: "4rem" }}>
+                <CurrentPageInput />
+              </div>
+              <div style={{ padding: "0 4px" }}>
+                / <NumberOfPages />
+              </div>
+              <div style={{ padding: "0 4px" }}>
+                <GoToNextPage />
+              </div>
+            </div>
+          );
+        }}
+      </Toolbar>
+    ),
+  });
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="fixed inset-0 h-screen w-screen bg-gray-100">
+      <Worker workerUrl={workerUrl}>
+        <div className="h-full w-full">
+          <Viewer
+            fileUrl="/catalogo.pdf"
+            plugins={[defaultLayoutPluginInstance]}
+            localization={spanishLocalization}
+            defaultScale={SpecialZoomLevel.PageWidth}
+            renderError={(error) => {
+              console.error("Error loading PDF:", error);
+              const errorName = error.name || "";
+              const errorMessage =
+                error.message || "No se pudo cargar el catálogo.";
+              return (
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-center p-8">
+                    <h2 className="text-2xl font-semibold mb-4 text-gray-800">
+                      {errorName === "InvalidPDFException"
+                        ? "Archivo PDF inválido"
+                        : "Error al cargar el PDF"}
+                    </h2>
+                    <p className="text-gray-600 mb-4">
+                      {errorName === "InvalidPDFException"
+                        ? "El archivo del catálogo no es válido o está corrupto."
+                        : errorMessage}
+                    </p>
+                    <button
+                      onClick={() => {
+                        window.location.reload();
+                      }}
+                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Reintentar
+                    </button>
+                  </div>
+                </div>
+              );
+            }}
+          />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </Worker>
     </div>
   );
 }
